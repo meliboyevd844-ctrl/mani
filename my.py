@@ -8,26 +8,13 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import Message
-from mistralai import Mistral
-
 import os
 from dotenv import load_dotenv
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 
 dp = Dispatcher()
 
-def mistral_chat(text: str) -> str:
-    with Mistral(api_key=MISTRAL_KEY) as mistral:
-        res = mistral.chat.complete(
-            model="mistral-small-latest",
-            messages=[
-                {"role": "user", "content": text}
-            ],
-            stream=False
-        )
-        return res.choices[0].message.content
 
 @dp.message(Command("start"))
 async def start_handler(message: Message):
@@ -40,12 +27,7 @@ async def start_handler(message: Message):
 async def chat_handler(message: Message):
     loading = await message.answer("⌛️ Javob tayyorlanmoqda...")
     try:
-        text = mistral_chat(message.text)
-        text = re.sub(r"^###\s*(.+)$", r"<b>\1</b>", text, flags=re.MULTILINE)
-
-        # **matn** ni <i>...</i> ga o‘tkazish
-        text = re.sub(r"\*\*(.+?)\*\*", r"<i>\1</i>", text)
-        await message.answer(text)
+        await message.answer(message.text)
     except Exception as e:
         await message.answer("Xatolik yuz berdi 😕")
         print(e)
